@@ -1,0 +1,33 @@
+name: Go Test and Coverage
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '1.21'
+
+    - name: Install dependencies
+      run: |
+        go get -u github.com/onsi/ginkgo/v2
+        go get -u github.com/onsi/gomega
+        go get -u golang.org/x/sys/windows/registry
+
+    - name: Run tests with coverage
+      run: |
+        go test ./... -coverprofile=coverage.out
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.out
